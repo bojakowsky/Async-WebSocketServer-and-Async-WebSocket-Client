@@ -1,0 +1,6 @@
+C:\Users\BRZ\Desktop\WebSockets Server\WebSockets Server\WebSockets Server\bin\Debug\WebSockets Server.exe.config
+C:\Users\BRZ\Desktop\WebSockets Server\WebSockets Server\WebSockets Server\bin\Debug\WebSockets Server.exe
+C:\Users\BRZ\Desktop\WebSockets Server\WebSockets Server\WebSockets Server\bin\Debug\WebSockets Server.pdb
+C:\Users\BRZ\Desktop\WebSockets Server\WebSockets Server\WebSockets Server\obj\Debug\WebSockets Server.exe
+C:\Users\BRZ\Desktop\WebSockets Server\WebSockets Server\WebSockets Server\obj\Debug\WebSockets Server.pdb
+C:\Users\BRZ\Desktop\WebSockets Server\WebSockets Server\WebSockets Server\obj\Debug\WebSockets Server.csprojResolveAssemblyReference.cache

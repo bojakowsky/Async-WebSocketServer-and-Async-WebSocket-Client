@@ -1,0 +1,5 @@
+C:\Users\BRZ\Desktop\WebSockets Server\ClientTest\ClientTest\bin\Debug\ClientTest.exe.config
+C:\Users\BRZ\Desktop\WebSockets Server\ClientTest\ClientTest\bin\Debug\ClientTest.exe
+C:\Users\BRZ\Desktop\WebSockets Server\ClientTest\ClientTest\bin\Debug\ClientTest.pdb
+C:\Users\BRZ\Desktop\WebSockets Server\ClientTest\ClientTest\obj\Debug\ClientTest.exe
+C:\Users\BRZ\Desktop\WebSockets Server\ClientTest\ClientTest\obj\Debug\ClientTest.pdb
