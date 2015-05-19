@@ -1,3 +1,6 @@
-#C# WebSockets, both client and server, web chat backend
-#Here we have test client (to test server behaviour), and server based on websockets, which will be used as backend for chat.
-#Will be merged with this contribution: https://github.com/mszynka/Shout-the-box/tree/frontend
+C# WebSockets, both client and server, web chat backend
+
+Here we have test client (to test server behaviour), and server based on websockets, which will be used as backend for chat.
+I have added javascript clients with basic serialization, thus c# client won't work becuse of WebSockets handshaking messages.
+
+Will be merged with this contribution: https://github.com/mszynka/Shout-the-box/tree/frontend
