@@ -1,26 +1,26 @@
 Workflow of the server and client:
 
 Server:
-    - Configure it to work on a specified IP and Port,
-    - Run the server,
-    - Wait for user to connect a server,
+    - Configure it to work on a specified IP and Port, // Done
+    - Run the server, // Done
+    - Wait for user to connect a server, // Done
     - Handshake the connection
-        if handshake is successful then remember connection and send a "Hi" message,
-        else remove the connection (handle exceptions etc.),
-    - User sends message with his username 
-        if available - send OK packet
-        else - send it's taken 
-    - Wait till message is received from connected user,
-    - Send message to general chat channel or specified recipient as response
-        check if recipient is still connected
-    - Inform Users that another user has joined
-    - Inform users that another user has exit 
+        if handshake is successful then remember connection and send a "Hi" message, // Done
+        else remove the connection (handle exceptions etc.), // Done
+    - User sends message with his username ?
+        if available - send OK packet ?
+        else - send it's taken ?
+    - Wait till message is received from connected user, // Done
+    - Send message to general chat channel or specified recipient as response // Done
+        check if recipient is still connected // Done
+    - Inform Users that another user has joined ?
+    - Inform users that another user has exit  ?
 
     Important: 
-        before sending any messages make sure if client is still conected
-        try to handle connections that are not open anymore
-        check for the maximum length of the message that users are sending 
-        check if data are serialized properly
+        before sending any messages make sure if client is still conected // Done
+        try to handle connections that are not open anymore // Done
+        check for the maximum length of the message that users are sending // Done
+        check if data are serialized properly ?
 
 
 
