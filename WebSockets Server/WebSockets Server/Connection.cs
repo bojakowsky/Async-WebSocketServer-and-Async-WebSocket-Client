@@ -7,14 +7,24 @@ using System.Net.Sockets;
 using System.Net;
 namespace WebSockets_Server
 {
+
+    /// <summary>
+    /// This class is like a mirror of established connection
+    /// here we hold all the bufor data for the current user
+    /// 
+    /// ToDo: bufor data should be stored in database
+    /// 
+    /// </summary>
+
+
     class Connection
     {
-        public TcpClient tcpClient = new TcpClient();
-        public byte[] buffer = new byte[295];
-
-        public string Id { get; set; }
-        public string Message { get; set; }
-        private string date;
+        public TcpClient tcpClient = new TcpClient();   // Field responsible for holding TCP connection
+        public byte[] buffer = new byte[306];           // Field for incoming data
+        public string Len { get; set; }                 // 3 char which is the total length of the data 
+        public string Id { get; set; }                  // 10 char unique ID for each connection (user)
+        public string Message { get; set; }             // 255 char message data 
+        private string date;                            // 19 char (day-month-year time)
         public string Date
         {
             get
@@ -26,9 +36,7 @@ namespace WebSockets_Server
                 date = value.ToString();
             }
         }
-        public MessageType Type;
-        public string RecipientId;
-
-
+        public MessageType Type;                        // Private or Broadcast
+        public string RecipientId;                      // 10 char unique ID of recipient
     }
 }

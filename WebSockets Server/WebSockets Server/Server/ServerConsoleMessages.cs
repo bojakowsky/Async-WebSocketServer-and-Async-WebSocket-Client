@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace WebSockets_Server.Server
 {
+
+    /// <summary>
+    /// I guess this class is self explanatory
+    /// Below there are a enum with messages that server handles
+    /// </summary>
+
     enum ServerConsoleMessagesEnum
     {
         //1 - 99 informational messages
@@ -46,7 +52,7 @@ namespace WebSockets_Server.Server
                     + "Configure server parameters for your needs \n"
                     + "and start it typing \"run\". \n"
                     + "For help type \"help\". \n"
-                    + "Default server address is 192.168.0.1:666 \n"
+                    + "Default server address is 192.168.0.100:666 \n"
                     + "<---------------------------------------------> \n");
                     break;
                 case ServerConsoleMessagesEnum.IPSetSuccessFully:

@@ -42,10 +42,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Connection.cs" />
-    <Compile Include="DataSent.cs" />
+    <Compile Include="DataHelper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server\ServerConsoleMessages.cs" />
+    <Compile Include="Server\ServerMethods.cs" />
     <Compile Include="Server\Serwer.cs" />
   </ItemGroup>
   <ItemGroup>

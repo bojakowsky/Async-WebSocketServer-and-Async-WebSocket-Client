@@ -1,0 +1,115 @@
+<!DOCTYPE HTML>
+<meta charset="utf-8" />
+<html>
+
+   <head>
+   
+      <script type="text/javascript">
+         function getDateTime()
+         {
+            var currentdate = new Date(); 
+            return
+                  var datetime = "Last Sync: " + currentdate.getDate() + "/"
+                      + (currentdate.getMonth()+1)  + "/" 
+                      + currentdate.getFullYear() + " @ "  
+                      + currentdate.getHours() + ":"  
+                      + currentdate.getMinutes() + ":" 
+                      + currentdate.getSeconds();
+         }
+
+         function unserializeData(str)
+         {
+            var user = pad('          ', str.substring(0,10) , false);
+            var time = pad('          ', str.substring(10,29), false);
+            var mess = pad('          ', str.substring(40,255), false);
+            var together = user.concat(' ' + time.concat(' ' + message));
+            return together;
+         }
+
+         function serializeData(user_name, date_time, type, recipient, message )
+         {
+
+            user_name = pad('          ', user_name , false);
+            date_time = pad('          ', getDateTime() , false);
+            type = pad('          ', type , false);
+            recipient = pad('          ', recipient , false);
+            message = pad('          ', message, false);
+
+            var all = user_name.concat(date_time.concat(type.concat(recipient.concat(message))));
+            var len = pad('000', len, true);
+            all = len + all;
+            // if length > x => error (...)
+            return all;
+         }
+
+         function pad(pad, str, padLeft) {
+           if (typeof str === 'undefined') 
+             return pad;
+           if (padLeft) {
+             return (pad + str).slice(-pad.length);
+           } else {
+             return (str + pad).substring(0, pad.length);
+           }
+         }
+
+         function WebSocketTest()
+         {
+            if ("WebSocket" in window)
+            {
+               alert("WebSocket is supported by your Browser!");
+               // Let us open a web socket
+               var ws = new WebSocket("ws://192.168.0.100:666");
+            
+               ws.onopen = function()
+               {
+                  // Web Socket is connected, send data using send()
+                  var string = "123456789001-03-2015 20:20:201----------TestTestTest";      
+                  string = pad('000', string.length, true) + string;
+                  alert(string.length)
+                  ws.send(string);
+                  alert("Message is sent...");
+               };
+            
+
+               ws.onmessage = function (evt) 
+               { 
+                  var d = document.getElementById('myDiv');
+                  d.innerHTML += evt.data + '<br/><br>';
+                  alert("Message is received...");
+               };
+            
+               ws.onclose = function()
+               {
+                  ws.close();
+                  alert("closing...");
+               }
+            
+            }
+
+            else
+            
+            {
+               // The browser doesn't support WebSocket
+               alert("WebSocket NOT supported by your Browser!");
+            }
+         }
+
+         function StopWebsocket()
+         {
+            ws.close();
+            alert("Closing websocket ;)");
+         }
+
+
+      </script>
+      
+   </head>
+   
+   <body>
+      <div id="sse">
+         <a href="javascript:WebSocketTest()">Run WebSocket</a>
+      </div>
+      <div id="myDiv"> </div>
+   </body>
+   
+</html>

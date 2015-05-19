@@ -1,0 +1,46 @@
+Workflow of the server and client:
+
+Server:
+    - Configure it to work on a specified IP and Port,
+    - Run the server,
+    - Wait for user to connect a server,
+    - Handshake the connection
+        if handshake is successful then remember connection and send a "Hi" message,
+        else remove the connection (handle exceptions etc.),
+    - User sends message with his username 
+        if available - send OK packet
+        else - send it's taken 
+    - Wait till message is received from connected user,
+    - Send message to general chat channel or specified recipient as response
+        check if recipient is still connected
+    - Inform Users that another user has joined
+    - Inform users that another user has exit 
+
+    Important: 
+        before sending any messages make sure if client is still conected
+        try to handle connections that are not open anymore
+        check for the maximum length of the message that users are sending 
+        check if data are serialized properly
+
+
+
+Client:
+    - On the web opening ask for the nickname that length is not longer than 10 chars,
+    - Try to establish connection
+        if connection is established - give access to the web
+        else "sorry, couldn't establish connection"
+    - Type a message on the general chat
+    - Type a private message to another user
+    - Close connection
+
+
+
+
+    //ToDo: 
+        exception handling on user exiting - cause not working
+        look for error where message is being cut (last letters)
+
+        thread that allows commands
+        logger need to log more
+
+        test whole idea

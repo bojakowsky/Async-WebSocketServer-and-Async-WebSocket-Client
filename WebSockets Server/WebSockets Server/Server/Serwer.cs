@@ -8,15 +8,15 @@ using System.Net;
 
 namespace WebSockets_Server
 {
-    class Serwer
+    partial class Serwer
     {
         #region fields, properties
 
-        public List <Connection> Connections = new List<Connection>();
-        private TcpListener TCPListener;
-        Object locker = new Object();
-        private int port = 0;
-        public IPAddress IPAddr { get; set; }
+        public List <Connection> Connections = new List<Connection>(); // list of all connected users
+        private TcpListener TCPListener;                               // socket listener, listens if there're any messages incoming
+        Object locker = new Object();                                  // locker is used to unable multiple threads work on some function
+        private int port = 0;                                          // server port
+        public IPAddress IPAddr { get; set; }                          // server IPAddress
         public int Port {
             get 
             {
@@ -35,12 +35,13 @@ namespace WebSockets_Server
         
         }
         
-
+        //Helper get method for IPAddress type
         public string getStringIPAddress()
         {
             return IPAddr.ToString();
         }
 
+        //Helper set method for IPAddress type
         public void setIPAddr(string ip)
         {
             try
@@ -63,16 +64,18 @@ namespace WebSockets_Server
 
         #endregion
 
+        //Default constructor, starts a configuration method for a server
         public Serwer() 
         {
             Server.ServerConsoleMessages.PrintMessage(Server.ServerConsoleMessagesEnum.StartingInfo);
             configuration();
         }
 
+        //Configuration method that handles console messages (see ServerConsoleMessages.cs)
         public void configuration()
         {
             string command = "";
-            while (!command.Equals("run"))
+            while (!command.Equals("run")) // don't run server until server admin types "run"
             {
                 command = Console.ReadLine();
                 commandExecutioner(command);
@@ -80,17 +83,20 @@ namespace WebSockets_Server
         }
 
         # region ServerConsoleMethods
+        //on typing help - prints help in the console
         public void HelpMethod()
         {
             Server.ServerConsoleMessages.PrintMessage(Server.ServerConsoleMessagesEnum.Help);
         }
-
+        
+        //set IP - on typing 'ip xxx.xxx.xxx.xxx' sets IP to this xxx address
         public void ipSetMethod(string ip)
         {
             setIPAddr(ip);
             //Exception is handled inside setIP
         }
 
+        //Set Port - on typing 'port x' , sets port to x
         public void portSetMethod(string port)
         {
             try
@@ -104,6 +110,7 @@ namespace WebSockets_Server
         }
         #endregion
 
+        //runMethod starts the server on specified configuration
         public void runMethod()
         {
             if (IPAddr == null)
@@ -113,169 +120,29 @@ namespace WebSockets_Server
             try
             {
                 TCPListener = new TcpListener(IPAddr, Port);
-                TCPListener.Start();
+                TCPListener.Start(); // Initialize and start TCPListener, now we're waiting for users
                 Server.ServerConsoleMessages.PrintMessage(Server.ServerConsoleMessagesEnum.ServerRunSuccessFully);
             }
             catch (Exception)
             {
-                Server.ServerConsoleMessages.PrintMessage(Server.ServerConsoleMessagesEnum.ServerRunError);
+                Server.ServerConsoleMessages.PrintMessage(Server.ServerConsoleMessagesEnum.ServerRunError); 
+                // if something went bad, print error
             }
 
             Console.WriteLine(
                   "<---------------------------------------------> \n"
                 + "Server IP Address: " + IPAddr.ToString() + "\t Port: " + Port + "\n"
                 + "<---------------------------------------------> \n");
-            TCPListener.BeginAcceptTcpClient(new AsyncCallback(AcceptCallback), null); 
+            TCPListener.BeginAcceptTcpClient(new AsyncCallback(AcceptCallback), null); // async method that waits for
+                                                                                       // tcpClient to connect to the server
         }
-
-        #region server tcp methods
-
-        public void ReadCallBack(IAsyncResult result)
-        {
-            lock (locker)
-            {
-                Connection connection = (Connection)result.AsyncState;
-                try
-                {
-                    connection.tcpClient.GetStream().
-                        BeginRead(connection.buffer, 0, connection.buffer.Length, new AsyncCallback(ReadCallBack), connection);
-                    DataSent.unserializeData(connection.buffer, connection);
-
-                    if (connection.RecipientId.StartsWith("----------"))
-                        sendToAll(connection.buffer);
-                    else
-                        sendPrivateMessage(connection);
-
-
-                }
-                catch (Exception)
-                {
-                    Console.WriteLine("Connection lost: " + ((IPEndPoint)connection.tcpClient.
-                    Client.RemoteEndPoint).Address + ":" +
-                    ((IPEndPoint)connection.tcpClient.Client.RemoteEndPoint).Port);
-                    disconnect(((IPEndPoint)connection.tcpClient.Client.RemoteEndPoint)); // usunięcie informacji o połączeniu
-                }
-            }
-        }
-
-        public void sendPrivateMessage(Connection con)
-        {
-            bool found = false;
-            foreach (var connection in Connections)
-            {
-                if (connection.Id.Equals(con.RecipientId))
-                {
-                    found = true;
-                    connection.tcpClient.GetStream().BeginWrite(con.buffer, 0, con.buffer.Length,
-                        new AsyncCallback(sendPrivate), connection);
-                    if (con != connection)
-                        con.tcpClient.GetStream().BeginWrite(con.buffer, 0, con.buffer.Length,
-                            new AsyncCallback(sendPrivate), con);
-                }
-            }
-            if (!found)
-            {
-                byte[] errorData = DataSent.serializeData(con.Id, "User has not been found!", DateTime.Now.ToString(), "1");
-                con.tcpClient.GetStream().BeginWrite(errorData, 0, errorData.Length,
-                    new AsyncCallback(sendPrivate), con);
-            }
-            
-        }
-
-        public void sendPrivate(IAsyncResult result)
-        {
-            Connection connection = (Connection)result.AsyncState;
-            connection.tcpClient.GetStream().EndWrite(result);
-        }
-
-        public void sendToAll(byte[] buffer)
-        {
-
-            foreach (var con in Connections)
-            {
-                con.tcpClient.GetStream().BeginWrite(buffer, 0, buffer.Length,
-                        new AsyncCallback(sendBroadcast), con);
-                
-            }
-        }
-
-        public void sendBroadcast(IAsyncResult result)
-        {
-            Connection connection = (Connection)result.AsyncState;
-            connection.tcpClient.GetStream().EndWrite(result);
-        }
-
-        public void AcceptCallback(IAsyncResult result)
-        {
-            Connection connection = new Connection();
-            lock (locker)
-            {
-                try
-                {
-                    connection = new Connection();
-                    connection.tcpClient = TCPListener.EndAcceptTcpClient(result); // zakończenie akceptowania klienta
-                    // dodanie klienta do listy połączonych klientów
-                    Connections.Add(connection);
-                }
-                catch (ObjectDisposedException e)
-                {
-                    Console.WriteLine(e.ToString());
-                }
-            }
-            Console.WriteLine("Client connected: " + 
-                ((IPEndPoint)connection.tcpClient.Client.RemoteEndPoint).Address + 
-                ":" + ((IPEndPoint)connection.tcpClient.Client.RemoteEndPoint).Port);
-            try
-            {
-                // rozpoczęcie asynchronicznego czytania danych wysyłanych przez protokół TCP
-                connection.tcpClient.GetStream().BeginRead(connection.buffer, 0, connection.buffer.Length, new AsyncCallback(ReadCallBack), connection);
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("Connection lost: " + ((IPEndPoint)connection.tcpClient.
-                    Client.RemoteEndPoint).Address + ":" + 
-                    ((IPEndPoint)connection.tcpClient.Client.RemoteEndPoint).Port);
-                disconnect(((IPEndPoint)connection.tcpClient.Client.RemoteEndPoint)); // usunięcie informacji o połączeniu
-            }
-            // rozpoczęcie asynchronicznego oczekiwania na następnego klienta
-            TCPListener.BeginAcceptTcpClient(new AsyncCallback(AcceptCallback), null);
-        }
-
-
-
-        public void disconnect(IPEndPoint endpoint)
-        {
-            lock (locker)
-            {
-                Connection connectionToDel = null;
-                foreach (Connection connection in Connections)
-                {
-                    if (connection != null && ((IPEndPoint)(connection.tcpClient.Client.RemoteEndPoint)).Equals(endpoint))
-                    {
-                        if (connection.tcpClient.Connected)
-                        {
-                            Console.WriteLine("Client disconnected: " + ((IPEndPoint)connection.tcpClient.Client.RemoteEndPoint).Address + 
-                                ":" + ((IPEndPoint)connection.tcpClient.Client.RemoteEndPoint).Port);
-                            connection.tcpClient.GetStream().Close();
-                            connection.tcpClient.Close();
-                        }
-                        connectionToDel = connection;
-                    }
-                }
-                if (connectionToDel != null)
-                {
-                    Connections.Remove(connectionToDel);
-                }
-            }
-        }
-        
-        #endregion
 
         # region Console Logger Functions
+        //Executes the command user types in
         public void commandExecutioner(string command)
         {
             string[] cmd = command.Split(' ');
-            if (!(cmd.Length == 2 || cmd.Length == 1))
+            if (!(cmd.Length == 2 || cmd.Length == 1)) // command should be like 'run' or 'port x' don't accept other command formats
             {
                 Server.ServerConsoleMessages.PrintMessage(
                     Server.ServerConsoleMessagesEnum.WrongCommandOrWrongNumberOfParams);
@@ -287,18 +154,22 @@ namespace WebSockets_Server
         
         }
 
+        //checks if typed command fits any of defined
         public void chooseCommand(string[] cmd)
         {
+            //Run method
             if (cmd[0].Equals(ServerCommands.run.ToString()))
             {
                 runMethod();
             }
-
+            
+            //Help method
             else if (cmd[0].Equals(ServerCommands.help.ToString()))
             {
                 HelpMethod();
             }
-
+            
+            //IPset method
             else if (cmd[0].Equals(ServerCommands.ip.ToString()) )
             {
                 if (cmd.Length != 2)
@@ -309,7 +180,8 @@ namespace WebSockets_Server
                 else 
                     ipSetMethod(cmd[1]);
             }
-
+            
+            //Port set method
             else if (cmd[0].Equals(ServerCommands.port.ToString()) )
             {
                 if (cmd.Length != 2)
@@ -320,7 +192,8 @@ namespace WebSockets_Server
                 else 
                     portSetMethod(cmd[1]);
             }
-
+            
+            //Else tell user that command is incorrect
             else
             {
                 Server.ServerConsoleMessages.PrintMessage(
@@ -328,6 +201,7 @@ namespace WebSockets_Server
             }
         }
 
+        //defined ServerCommands
         enum ServerCommands
         {
             run,

@@ -1,0 +1,153 @@
+<!DOCTYPE HTML>
+<meta charset="utf-8" />
+<html>
+
+   <head>
+   <style>
+    body {
+        background-color: black;
+    }
+
+    a {
+        color: #FF0000;
+    }
+
+    #sse {
+         color: rgb(255,0,0);
+    }
+    #myDiv {
+        background-color: red;
+        margin-left: 40px;
+        padding: 20px 20px 20px 20px;
+    }
+    </style>
+      <script type="text/javascript">
+         function getDateTime()
+         {
+            var currentdate = new Date(); 
+            var datetime = pad('0000',currentdate.getFullYear(),true) +  "-"
+                      + pad('00',(currentdate.getMonth()+1), true)  + "-" 
+                      + pad('00',currentdate.getDate(), true) + " "  
+                      + pad('00',currentdate.getHours(),true) + ":"  
+                      + pad('00',currentdate.getMinutes(),true) + ":" 
+                      + pad('00',currentdate.getSeconds(),true);
+            return datetime;
+                  
+         }
+
+         function unserializeData(str)
+         {
+            var len = str.substring(0,3);
+            var user = pad('          ', str.substring(3,13) , false).concat(' ');
+            var time = str.substring(13,32);
+            var mess = str.substring(43, len);
+            var together = user.concat(time.concat(mess));
+            return together;
+         }
+
+         function serializeData(user_name, type, recipient, message )
+         {
+
+            user_name = pad('          ', user_name , false);
+            var date_time = getDateTime();
+            type = pad(' ', type , false);
+            recipient = pad('          ', recipient , false);
+            var all = user_name.concat(date_time.concat(type.concat(recipient.concat(message))));
+            var len = pad('000', (all.length + 3) , true);
+            all = len + all ;
+            // if length > x => error (...)
+            return all;
+         }
+
+         function pad(pad, str, padLeft) {
+           if (typeof str === 'undefined') 
+             return pad;
+           if (padLeft) {
+             return (pad + str).slice(-pad.length);
+           } else {
+             return (str + pad).substring(0, pad.length);
+           }
+         }
+
+         function WebSocketTest()
+         {
+            if ("WebSocket" in window)
+            {
+               alert("WebSocket is supported by your Browser!");
+               // Let us open a web socket
+               var ws = new WebSocket("ws://192.168.0.100:666");
+            
+               ws.onopen = function()
+               {
+                  // Web Socket is connected, send data using send()
+
+                  //data that should be sent as Broadcast
+                  var user_name = "szynek";
+                  var type = "1";
+                  var recipient = "----------";
+                  var message = "Test message! ;Test message! ;)))Test message! ;)))Test message! ;)))Test message! ;)))Test message! ;)))Test message! ;)))Test message! ;)))Test message! ;)))Test message! ;)))Test message! ;)))Test message! ;)))Test message! ;)))Test message!1234567890X";
+                  var string = serializeData(user_name, type, recipient, message)    
+                  alert(string.length);
+                  ////data that should be sent to user AlFreD from szynek
+                  /*var user_name = "szynek";
+                  var type = "2";
+                  var recipient = "AlFreD";
+                  var message = "Test message!";
+                  */
+                  ws.send(string);
+                  alert("Message is sent...");
+               };
+            
+
+               ws.onmessage = function (evt) 
+               { 
+                  var d = document.getElementById('myDiv');
+                  d.innerHTML += unserializeData(evt.data) + '<br/> <br/>';
+                  alert("Message is received...");
+               };
+            
+               ws.onclose = function()
+               {
+                  alert("closing...");
+               };
+
+               window.onbeforeunload = function() {
+                  ws.onclose = function () {}; // disable onclose handler first
+                  ws.close();
+                  alert("Force close!")
+               };
+            
+            }
+
+            else
+            
+            {
+               // The browser doesn't support WebSocket
+               alert("WebSocket NOT supported by your Browser!");
+            }
+         }
+
+         function StopWebsocket()
+         {
+            ws.close();
+            alert("Closing websocket ;)");
+         }
+
+
+      </script>
+      
+   </head>
+   
+   <body>
+      <div id="sse" align = "center">
+        <br/>
+        
+         <a href="javascript:WebSocketTest()">Run WebSocket</a>
+
+        <br/>
+      </div>
+      <!--<input type = "button" id="disconnect" onclick="StopWebsocket();">Disconnect</button> -->
+      <div id="myDiv" paddin-left="10%"> </div>
+   </body>
+   
+</html>
